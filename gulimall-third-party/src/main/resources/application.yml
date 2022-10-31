@@ -9,6 +9,11 @@ spring:
       oss:
         endpoint: oss-cn-zhangjiakou.aliyuncs.com
         bucket: gulimall-logos
+      sms:
+        host: https://dfsns.market.alicloudapi.com
+        path: /data/send_sms
+        template_id: TPL_0000
+        appcode: 925633c216f74f2183939048e9451cc4
 
   application:
     name: gulimall-third-party

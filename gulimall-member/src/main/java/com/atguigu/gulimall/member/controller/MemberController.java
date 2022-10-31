@@ -3,13 +3,15 @@ package com.atguigu.gulimall.member.controller;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.atguigu.common.exception.BizCodeEnum;
+import com.atguigu.gulimall.member.exception.PhoneException;
+import com.atguigu.gulimall.member.exception.UsernameException;
 import com.atguigu.gulimall.member.feign.CouponFeignService;
+import com.atguigu.gulimall.member.vo.MemberUserLoginVo;
+import com.atguigu.gulimall.member.vo.MemberUserRegisterVo;
+import com.atguigu.gulimall.member.vo.SocialUser;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.atguigu.gulimall.member.entity.MemberEntity;
 import com.atguigu.gulimall.member.service.MemberService;
@@ -33,6 +35,44 @@ public class MemberController {
 
     @Autowired
     CouponFeignService couponFeignService;
+
+
+    @PostMapping(value = "/oauth2/login")
+  public   R oauthLogin(@RequestBody SocialUser socialUser) throws Exception{
+        MemberEntity login = memberService.login(socialUser);
+        if (login !=null){
+            return R.ok().setData(login);
+        }else {
+            return R.error(BizCodeEnum.LOGINACCT_PASSWORD_EXCEPTION.getCode(),BizCodeEnum.LOGINACCT_PASSWORD_EXCEPTION.getMessage() );
+        }
+
+    }
+
+
+    @PostMapping("/login")
+    public R login(@RequestBody MemberUserLoginVo memberUserLoginVo){
+        MemberEntity login = memberService.login(memberUserLoginVo);
+        if (login !=null){
+            return R.ok().setData(login);
+        }else {
+            return R.error(BizCodeEnum.LOGINACCT_PASSWORD_EXCEPTION.getCode(),BizCodeEnum.LOGINACCT_PASSWORD_EXCEPTION.getMessage() );
+        }
+
+    }
+
+    @PostMapping(value = "/register")
+    public R register(@RequestBody MemberUserRegisterVo vo) {
+
+        try {
+            memberService.register(vo);
+        } catch (PhoneException e) {
+            return R.error(BizCodeEnum.PHONE_EXIST_EXCEPTION.getCode(),BizCodeEnum.PHONE_EXIST_EXCEPTION.getMessage());
+        } catch (UsernameException e) {
+            return R.error(BizCodeEnum.USER_EXIST_EXCEPTION.getCode(),BizCodeEnum.USER_EXIST_EXCEPTION.getMessage());
+        }
+
+        return R.ok();
+    }
 
     @RequestMapping("/coupons")
     public R test(){
